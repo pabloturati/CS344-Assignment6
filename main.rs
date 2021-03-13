@@ -157,16 +157,16 @@ fn main() {
     }
     // 4. Collects the intermediate sums from all the threads
    
-    let mut second_intermediate_sums : Vec<usize> = Vec::new();
+    intermediate_sums = Vec::new();
     for child in children {
-        second_intermediate_sums.push(child.join().unwrap());
+        intermediate_sums.push(child.join().unwrap());
     } 
 
     // 5. Prints information about the intermediate sums
-    println!("Intermediate sums = {:?}", second_intermediate_sums);
+    println!("Intermediate sums = {:?}", intermediate_sums);
 
     // 5. Calls reduce_data to process the intermediate sums
-    let second_sum = reduce_data(&second_intermediate_sums);
+    let second_sum = reduce_data(&intermediate_sums);
 
     // 6. Prints the final sum computed by reduce_data
     println!("Sum = {}", second_sum);
@@ -188,22 +188,28 @@ fn main() {
 */
 fn partition_data(num_partitions: usize, v: &Vec<usize>) -> Vec<Vec<usize>>{
     let partition_size = v.len() / num_partitions;
+    let mut remainder = v.len() % num_partitions;
 
     // Create a vector that will contain vectors of integers
     let mut ys: Vec<Vec<usize>> = Vec::new();
-    let mut counter = 0;
+    let mut curr_index = 0;
     
     for _ in 0..num_partitions{
         // Create vector
         let mut part_vect : Vec<usize> = Vec::new();
-        
+        // let specific_partition_size
+        let mut specific_partition_size = partition_size;
+        if remainder > 0{
+            specific_partition_size += 1;
+            remainder -= 1;
+        }
         // Populate it
-        for i in 0..partition_size{
-            part_vect.push(v[i+counter]);
+        for i in 0..specific_partition_size{
+            part_vect.push(v[i+curr_index]);
         }
 
         // Increase main counter
-        counter += partition_size;
+        curr_index += specific_partition_size;
 
         // Add it to vector of vectors
         ys.push(part_vect);
