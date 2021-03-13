@@ -1,4 +1,5 @@
 use std::env; // to get arugments passed to the program
+use std::thread;
 
 /*
 * Print the number of partitions and the size of each partition
@@ -123,8 +124,14 @@ fn main() {
 
     // Change the following code to create 2 threads that run concurrently and each of which uses map_data() function to process one of the two partitions
 
-    intermediate_sums.push(map_data(&xs[0]));
-    intermediate_sums.push(map_data(&xs[1]));
+    let xs0_clone = xs[0].clone();
+    let xs1_clone = xs[1].clone();
+
+    let inter_sum1_handle = thread::spawn(move || map_data(&xs0_clone));
+    let inter_sum2_handle = thread::spawn(move || map_data(&xs1_clone));
+
+    intermediate_sums.push(inter_sum1_handle.join().unwrap());
+    intermediate_sums.push(inter_sum2_handle.join().unwrap());
 
     // CHANGE CODE END: Don't change any code below this line until the next CHANGE CODE comment
 
@@ -137,8 +144,16 @@ fn main() {
 
     // CHANGE CODE: Add code that does the following:
     // 1. Calls partition_data to partition the data into equal partitions
+    let ys = partition_data(num_partitions, &v);
     // 2. Calls print_partition_info to print info on the partitions that have been created
+    print_partition_info(&ys);
+
     // 3. Creates one thread per partition and uses each thread to concurrently process one partition
+    // let partition_thread_bag: Vec
+
+    // for partition in 0..num_partitions{
+    //     let new_thread_handler
+    // }
     // 4. Collects the intermediate sums from all the threads
     // 5. Prints information about the intermediate sums
     // 5. Calls reduce_data to process the intermediate sums
@@ -161,6 +176,26 @@ fn main() {
 * 
 */
 fn partition_data(num_partitions: usize, v: &Vec<usize>) -> Vec<Vec<usize>>{
-    // Remove the following line which has been added to remove a compiler error
-    partition_data_in_two(v)
+    let partition_size = v.len() / num_partitions;
+
+    // Create a vector that will contain vectors of integers
+    let mut ys: Vec<Vec<usize>> = Vec::new();
+    let mut counter = 0;
+    
+    for partition in 0..num_partitions{
+        // Create vector
+        let mut part_vect : Vec<usize> = Vec::new();
+        
+        // Populate it
+        for i in 0..partition_size{
+            part_vect.push(v[i+counter]);
+        }
+
+        // Increase main counter
+        counter += partition_size;
+
+        // Add it to vector of vectors
+        ys.push(part_vect);
+    }
+    ys
 }
