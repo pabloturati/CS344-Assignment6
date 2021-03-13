@@ -193,7 +193,7 @@ fn partition_data(num_partitions: usize, v: &Vec<usize>) -> Vec<Vec<usize>>{
     let mut ys: Vec<Vec<usize>> = Vec::new();
     let mut counter = 0;
     
-    for partition in 0..num_partitions{
+    for _ in 0..num_partitions{
         // Create vector
         let mut part_vect : Vec<usize> = Vec::new();
         
