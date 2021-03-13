@@ -144,21 +144,32 @@ fn main() {
 
     // CHANGE CODE: Add code that does the following:
     // 1. Calls partition_data to partition the data into equal partitions
-    let ys = partition_data(num_partitions, &v);
+    let partition_bag = partition_data(num_partitions, &v);
+    
     // 2. Calls print_partition_info to print info on the partitions that have been created
-    print_partition_info(&ys);
+    print_partition_info(&partition_bag.clone());
 
     // 3. Creates one thread per partition and uses each thread to concurrently process one partition
-    // let partition_thread_bag: Vec
+    let mut children = vec![];
 
-    // for partition in 0..num_partitions{
-    //     let new_thread_handler
-    // }
+    for partition in partition_bag {
+        children.push(thread::spawn(move || map_data(&partition)));
+    }
     // 4. Collects the intermediate sums from all the threads
-    // 5. Prints information about the intermediate sums
-    // 5. Calls reduce_data to process the intermediate sums
-    // 6. Prints the final sum computed by reduce_data
+   
+    let mut second_intermediate_sums : Vec<usize> = Vec::new();
+    for child in children {
+        second_intermediate_sums.push(child.join().unwrap());
+    } 
 
+    // 5. Prints information about the intermediate sums
+    println!("Intermediate sums = {:?}", second_intermediate_sums);
+
+    // 5. Calls reduce_data to process the intermediate sums
+    let second_sum = reduce_data(&second_intermediate_sums);
+
+    // 6. Prints the final sum computed by reduce_data
+    println!("Sum = {}", second_sum);
 }
 
 /*
